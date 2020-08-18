@@ -1,19 +1,10 @@
-package io.emqx.exproto.sdk;
+package io.emqx.exproto;
 
 import com.erlport.erlang.term.Atom;
 import com.erlport.erlang.term.Tuple;
 
 import java.util.ArrayList;
 
-/**
- * transform erlang data type conninfo
- * <p>
- * -type conninfo() :: [ {socktype, tcp | tls | udp | dtls},
- * , {peername, {inet:ip_address(), inet:port_number()}},
- * , {sockname, {inet:ip_address(), inet:port_number()}},
- * , {peercert, nossl | [{cn, string()}, {dn, string()}]}
- * ]).
- */
 public class ConnectionInfo {
     private SocketType socketType;
     private String socketIP;
@@ -24,10 +15,6 @@ public class ConnectionInfo {
     private String cert_cn;
     private String cert_dn;
 
-    //connInfo=[Tuple{elements=[Atom{value='socktype'},Atom{value='tcp'}]},
-    // Tuple{elements=[Atom{value='peername'},Tuple{elements=[Tuple{elements=[127, 0, 0, 1]}, -9461]}]},
-    // Tuple{elements=[Atom{value='sockname'},Tuple{elements=[Tuple{elements=[127, 0, 0, 1]}, 7993]}]},
-    // Tuple{elements=[Atom{value='peercert'}, Atom{value='nossl'}]}]
     public static ConnectionInfo praser(Object connInfo) {
         ConnectionInfo connectionInfo = new ConnectionInfo();
         ArrayList<Object> connInfoList = (ArrayList<Object>) connInfo;

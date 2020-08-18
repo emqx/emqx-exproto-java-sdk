@@ -1,4 +1,4 @@
-package io.emqx.exproto.sdk;
+package io.emqx.exproto;
 
 public enum SocketType {
     tcp , tls , udp , dtls

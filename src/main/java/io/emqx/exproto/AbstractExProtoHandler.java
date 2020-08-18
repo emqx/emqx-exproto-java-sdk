@@ -1,29 +1,7 @@
-# Exproto Java SDK
+package io.emqx.exproto;
 
-
-
-## Requirements
-
-- JDK 1.8+
-- Depend on `emqx-exproto-java-sdk.jar` 
-
-## Get Started
-
-1. First of all, create your Java project.
-2. Download the [emqx-exproto-java-sdk.jar](https://github.com/emqx/emqx-exproto-java-sdk/blob/master/SDK/emqx-exproto-java-sdk-0.1.0.jar)  
-3. Add sdk: `emqx-exproto-java-sdk.jar` to your project dependency.
-4. Copy `example/ExProtoHandlerDemo.java` into your project.
-5. Compiled your project and edit exproto plugin properties file, path ```emqx/etc/plugins/emqx_exproto.conf```  
-```protperties
-exproto.listener.protoname = tcp://0.0.0.0:7993
-exproto.listener.protoname.driver = java
-exproto.listener.protoname.driver_search_path = data/javaexprotodemo
-exproto.listener.protoname.driver_callback_module = ExProtoHandlerDemo
-```
-6. Copy `ExProtoHandlerDemo.class` and `emqx-exproto-java-sdk.jar` to `emqx/data/javaexprotodemo`
-## Java code example
-```java
-import io.emqx.exproto.*;
+import com.erlport.Erlang;
+import com.erlport.erlang.term.Binary;
 
 /**
  * EMQ X ExProto java SDK;
@@ -38,17 +16,18 @@ import io.emqx.exproto.*;
  * <p>
  * load your AbstractExProtoHandler in the "Nonparametric construction method".
  */
-public class ExProtoHandlerDemo extends AbstractExProtoHandler {
+public abstract class AbstractExProtoHandler extends ExProto {
 
-    public ExProtoHandlerDemo() {
-        ExProto.loadExProtoHandler(new ExProtoHandlerDemo(new String[]{"Don't use System.in.*", "Don't use System.out.*"}));
-    }
+    /*
+    TODO :  build your nonparametric construction method,
+            and invoke " ExprotoSDK.loadExprotoHandler(AbstractExprotoHandler handler)" ,load your handler in SDK;
 
-    public ExProtoHandlerDemo(String[] args) {
-        for (String arg : args) {
-            System.err.println(arg);
-        }
-    }
+            as :
+            public AbstractExProtoHandler() {
+                ExProto.loadExProtoHandler(ExProtoHandler);
+            }
+     */
+
 
     /**
      * call back function :
@@ -57,11 +36,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      * @param connection     Connection Pid (from erlang data type).
      * @param connectionInfo Client information ; include socket type,socket name,peer name,peer cert.
      */
-    @Override
-    public void onConnectionEstablished(Connection connection, ConnectionInfo connectionInfo) {
-        System.err.println(connection);
-        System.err.println(connectionInfo);
-    }
+    public abstract void onConnectionEstablished(Connection connection, ConnectionInfo connectionInfo);
 
     /**
      * call back function:
@@ -70,11 +45,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      * @param connection Connection Pid (from erlang data type).
      * @param data       byte arr.
      */
-    @Override
-    public void onConnectionReceived(Connection connection, byte[] data) {
-        System.err.println(connection);
-        System.err.println(new String(data));
-    }
+    public abstract void onConnectionReceived(Connection connection, byte[] data);
 
     /**
      * call back function:
@@ -83,11 +54,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      * @param connection Connection Pid (from erlang data type).
      * @param reason     String bytes;
      */
-    @Override
-    public void onConnectionTerminated(Connection connection, byte[] reason) {
-        System.err.println(connection);
-        System.err.println(new String(reason));
-    }
+    public abstract void onConnectionTerminated(Connection connection, byte[] reason);
 
     /**
      * call back function:
@@ -96,19 +63,8 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      * @param connection  Connection Pid (from erlang data type).
      * @param messagesArr String bytes;
      */
-    @Override
-    public void onConnectionDeliver(Connection connection, DeliverMessage[] messagesArr) {
-        System.err.println(connection);
-        for (DeliverMessage deliverMessage : messagesArr) {
-            System.err.println(deliverMessage);
-        }
-    }
-}
+    public abstract void onConnectionDeliver(Connection connection, DeliverMessage[] messagesArr);
 
-```
-## SDK Function
-### 1. send
-```java
     /**
      * SDK provide function:
      * Send message to client connection
@@ -119,9 +75,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
     public void send(Connection connection, byte[] data) throws Exception {
         Erlang.call("emqx_exproto", "send", new Object[]{connection.getPid(), new Binary(data)}, 5000);
     }
-```
-###  2.terminate
-```java
+
     /**
      * SDK provide function:
      * Terminate client connection.
@@ -132,10 +86,6 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
         Erlang.call("emqx_exproto", "close", new Object[]{connection.getPid()}, 5000);
     }
 
-```
-###  3. register
-
-```java
     /**
      * SDK provide function:
      * Register a client in EMQ X Broker.
@@ -146,10 +96,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
     public void register(Connection connection, ClientInfo clientInfo) throws Exception {
         Erlang.call("emqx_exproto", "register", new Object[]{connection.getPid(), ClientInfo.toErlangDataType(clientInfo)}, 5000);
     }
-```
 
-### 4.publish
-```java
     /**
      * SDK provide function:
      * Publish message to EMQ X Broker
@@ -160,10 +107,8 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
     public void publish(Connection connection, DeliverMessage message) throws Exception {
         Erlang.call("emqx_exproto", "publish", new Object[]{connection.getPid(), DeliverMessage.toErlangDataType(message)}, 5000);
     }
-```
-### 5. subscribeTopic
-```java
-  /**
+
+    /**
      * SDK provide function:
      * Subscribe topic in EMQ X Broker
      *
@@ -174,17 +119,9 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
     public void subscribe(Connection connection, String topic, int qos) throws Exception {
         Erlang.call("emqx_exproto", "subscribe", new Object[]{connection.getPid(), new Binary(topic), qos}, 5000);
     }
-```
-## Note: 
-1. NOT read/write `System.out.*` and `System.in` Stream. They are used to communicate with EMQ X.
-2. Invoke ``ExprotoSDK.loadExprotoHandler(AbstractExprotoHandler handler)`` load your AbstractExprotoHandler in the ``Nonparametric construction method``.  
 
+    public static void loadExProtoHandler(AbstractExProtoHandler handler) {
+        loadExProtoHandler(handler);
+    }
 
-## Deploy
-1. Execute `bin/emqx console` to start EMQ X and load the `emqx_exproto` plugin.
-2. Try to establish a telnet connection and observe the console output.
-
-
-## Author
-
-- [DDDHuang](https://github.com/DDDHuang)
+}

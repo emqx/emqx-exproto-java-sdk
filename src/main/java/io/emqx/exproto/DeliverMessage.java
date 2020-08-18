@@ -1,4 +1,4 @@
-package io.emqx.exproto.sdk;
+package io.emqx.exproto;
 
 import com.erlport.erlang.term.Atom;
 import com.erlport.erlang.term.Binary;
@@ -7,18 +7,6 @@ import com.erlport.erlang.term.Tuple;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/**
- * transform erlang data type message
- * <p>
- * <p>
- * -type message() :: [ {id, binary()}
- * , {qos, integer()}
- * , {from, binary()}
- * , {topic, binary()}
- * , {payload, binary()}
- * , {timestamp, integer()}
- * ].
- */
 public class DeliverMessage {
     private String id;
     private int qos;
@@ -82,23 +70,6 @@ public class DeliverMessage {
         return deliverMessage;
     }
 
-
-    // {id, binary()}
-//                   , {qos, integer()}
-//                   , {from, binary()}
-//                   , {topic, binary()}
-//                   , {payload, binary()}
-//                   , {timestamp, integer()}
-//    public static Tuple toErlangDataType(DeliverMessage deliverMessage) {
-//        Tuple deliverMessageTuple = new Tuple(6);
-//        deliverMessageTuple.set(0, Tuple.two(new Atom("id"), new Binary(deliverMessage.getId())));
-//        deliverMessageTuple.set(1, Tuple.two(new Atom("qos"), deliverMessage.getQos()));
-//        deliverMessageTuple.set(2, Tuple.two(new Atom("from"), new Binary(deliverMessage.getFrom())));
-//        deliverMessageTuple.set(3, Tuple.two(new Atom("topic"), new Binary(deliverMessage.getTopic())));
-//        deliverMessageTuple.set(4, Tuple.two(new Atom("payload"), new Binary(deliverMessage.getPayload())));
-//        deliverMessageTuple.set(5, Tuple.two(new Atom("timestamp"), deliverMessage.getTimestamp()));
-//        return deliverMessageTuple;
-//    }
 
     public static ArrayList<Tuple> toErlangDataType(DeliverMessage deliverMessage) {
         ArrayList<Tuple> tupleArrayList = new ArrayList<>();

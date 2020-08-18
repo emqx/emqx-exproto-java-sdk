@@ -1,102 +1,81 @@
-import com.erlport.erlang.term.Pid;
-import io.emqx.exproto.sdk.AbstractExProtoHandler;
-import io.emqx.exproto.sdk.ConnectionInfo;
-import io.emqx.exproto.sdk.DeliverMessage;
-import io.emqx.exproto.sdk.ExProtoSDK;
+import io.emqx.exproto.*;
 
 /**
- * EMQ X Exproto java SDK;
+ * EMQ X ExProto java SDK;
  * <p>
  * Connection java project to EMQ X Broker.
  * Note 1:
  * Not use "System.in.*" or "System.out.*"  They are used to communicate with EMQ X.
  * Note 2:
- * Invoke  "ExprotoSDK.loadExprotoHandler(AbstractExprotoHandler handler)"
+ * Invoke  "ExProtoSDK.loadExProtoHandler(AbstractExProtoHandler handler)"
  * or
- * "AbstractExprotoHandler.loadExprotoHandler(AbstractExprotoHandler handler)"
+ * "AbstractExProtoHandler.loadExProtoHandler(AbstractExProtoHandler handler)"
  * <p>
- * <p>
- * <p>
- * SDK provide function:
- * <p>
- * void sendToConnection(Pid connId, byte[] data)
- * <p>
- * void terminateConnection(Pid connId)
- * <p>
- * void registerClient(Pid connId, ClientInfo clientInfo)
- * <p>
- * void publishMessage(Pid connPid, DeliverMessage message)
- * <p>
- * void subscribeTopic(Pid connId, String topic, int qos)
+ * load your AbstractExProtoHandler in the "Nonparametric construction method".
  */
 public class ExProtoHandlerDemo extends AbstractExProtoHandler {
-   /*
-    TODO :  build your nonparametric construction method,
-            and invoke " ExprotoSDK.loadExprotoHandler(AbstractExprotoHandler handler)" ,load your handler in SDK;
-
-            as :
-             public ExprotoHandlerDemo() {
-                AbstractExprotoHandler handler =new ExprotoHandlerDemo("ExprotoHandler Name");
-                ExprotoSDK.loadExprotoHandler(handler);
-            }
-     */
 
     public ExProtoHandlerDemo() {
-        AbstractExProtoHandler handler = new ExProtoHandlerDemo("ExprotoHandler Name");
-        ExProtoSDK.loadExProtoHandler(handler);
+        ExProto.loadExProtoHandler(new ExProtoHandlerDemo(new String[]{"Don't use System.in.*", "Don't use System.out.*"}));
     }
 
-    String name;
-
-    public ExProtoHandlerDemo(String name) {
-        this.name = name;
+    public ExProtoHandlerDemo(String[] args) {
+        for (String arg : args) {
+            System.err.println(arg);
+        }
     }
 
     /**
      * call back function :
      * Client connect to EMQ X broker.
      *
-     * @param connId         Connection Pid (from erlang data type).
+     * @param connection     Connection Pid (from erlang data type).
      * @param connectionInfo Client information ; include socket type,socket name,peer name,peer cert.
      */
     @Override
-    public void onConnectionEstablished(Pid connId, ConnectionInfo connectionInfo) {
-
+    public void onConnectionEstablished(Connection connection, ConnectionInfo connectionInfo) {
+        System.err.println(connection);
+        System.err.println(connectionInfo);
     }
 
     /**
      * call back function:
      * Message data from client.
      *
-     * @param connId Connection Pid (from erlang data type).
-     * @param data   byte arr.
+     * @param connection Connection Pid (from erlang data type).
+     * @param data       byte arr.
      */
     @Override
-    public void onConnectionReceived(Pid connId, byte[] data) {
-
+    public void onConnectionReceived(Connection connection, byte[] data) {
+        System.err.println(connection);
+        System.err.println(new String(data));
     }
 
     /**
      * call back function:
      * Client connection terminated .
      *
-     * @param connId Connection Pid (from erlang data type).
-     * @param reason String bytes;
+     * @param connection Connection Pid (from erlang data type).
+     * @param reason     String bytes;
      */
     @Override
-    public void onConnectionTerminated(Pid connId, byte[] reason) {
-
+    public void onConnectionTerminated(Connection connection, byte[] reason) {
+        System.err.println(connection);
+        System.err.println(new String(reason));
     }
 
     /**
      * call back function:
      * Receive message from subscribed topic.
      *
-     * @param connId      Connection Pid (from erlang data type).
+     * @param connection  Connection Pid (from erlang data type).
      * @param messagesArr String bytes;
      */
     @Override
-    public void onConnectionDeliver(Pid connId, DeliverMessage[] messagesArr) {
-
+    public void onConnectionDeliver(Connection connection, DeliverMessage[] messagesArr) {
+        System.err.println(connection);
+        for (DeliverMessage deliverMessage : messagesArr) {
+            System.err.println(deliverMessage);
+        }
     }
 }
