@@ -1,8 +1,8 @@
 import com.erlport.erlang.term.Pid;
-import io.emqx.exproto.sdk.AbstractExprotoHandler;
+import io.emqx.exproto.sdk.AbstractExProtoHandler;
 import io.emqx.exproto.sdk.ConnectionInfo;
 import io.emqx.exproto.sdk.DeliverMessage;
-import io.emqx.exproto.sdk.ExprotoSDK;
+import io.emqx.exproto.sdk.ExProtoSDK;
 
 /**
  * EMQ X Exproto java SDK;
@@ -29,7 +29,7 @@ import io.emqx.exproto.sdk.ExprotoSDK;
  * <p>
  * void subscribeTopic(Pid connId, String topic, int qos)
  */
-public class ExprotoHandlerDemo extends AbstractExprotoHandler {
+public class ExProtoHandlerDemo extends AbstractExProtoHandler {
    /*
     TODO :  build your nonparametric construction method,
             and invoke " ExprotoSDK.loadExprotoHandler(AbstractExprotoHandler handler)" ,load your handler in SDK;
@@ -41,14 +41,14 @@ public class ExprotoHandlerDemo extends AbstractExprotoHandler {
             }
      */
 
-    public ExprotoHandlerDemo() {
-        AbstractExprotoHandler handler = new ExprotoHandlerDemo("ExprotoHandler Name");
-        ExprotoSDK.loadExprotoHandler(handler);
+    public ExProtoHandlerDemo() {
+        AbstractExProtoHandler handler = new ExProtoHandlerDemo("ExprotoHandler Name");
+        ExProtoSDK.loadExProtoHandler(handler);
     }
 
     String name;
 
-    public ExprotoHandlerDemo(String name) {
+    public ExProtoHandlerDemo(String name) {
         this.name = name;
     }
 

@@ -14,7 +14,7 @@
 3. Add the sdk: `emqx-exproto-java-sdk.jar` and `erlport.jar` to your project dependency.
 4. Write your code :  
  step 1  
- Extends ``io.emqx.exproto.sdk.AbstractExprotoHandler``.  
+ Extends ``io.emqx.exproto.sdk.AbstractExProtoHandler``.  
  step 2  
  Invoke  ``ExprotoSDK.loadExprotoHandler(AbstractExprotoHandler handler)`` load your AbstractExprotoHandler in the ``Nonparametric construction method``.  
  step 3  
@@ -29,10 +29,10 @@ exproto.listener.protoname.driver_callback_module = your class name (extends Abs
  ## Code Example
 ```java
 import com.erlport.erlang.term.Pid;
-import io.emqx.exproto.sdk.AbstractExprotoHandler;
+import io.emqx.exproto.sdk.AbstractExProtoHandler;
 import io.emqx.exproto.sdk.ConnectionInfo;
 import io.emqx.exproto.sdk.DeliverMessage;
-import io.emqx.exproto.sdk.ExprotoSDK;
+import io.emqx.exproto.sdk.ExProtoSDK;
 /**
  * EMQ X Exproto java SDK;
  * 
@@ -56,7 +56,7 @@ import io.emqx.exproto.sdk.ExprotoSDK;
  * 
  * void subscribeTopic(Pid connId, String topic, int qos)
  */
-public class ExprotoHandlerDemo extends AbstractExprotoHandler {
+public class ExprotoHandlerDemo extends AbstractExProtoHandler {
 
     /*
        TODO :  build your nonparametric construction method,
@@ -70,8 +70,8 @@ public class ExprotoHandlerDemo extends AbstractExprotoHandler {
         */
    
        public ExprotoHandlerDemo() {
-           AbstractExprotoHandler handler = new ExprotoHandlerDemo("ExprotoHandler Name");
-           ExprotoSDK.loadExprotoHandler(handler);
+           AbstractExProtoHandler handler = new ExprotoHandlerDemo("ExprotoHandler Name");
+           ExProtoSDK.loadExProtoHandler(handler);
        }
    
        String name;
@@ -207,9 +207,6 @@ public void subscribeTopic(Pid connId, String topic, int qos) throws Exception {
 1. Execute `bin/emqx console` to start EMQ X and load the `emqx_exproto` plugin.
 2. Try to establish a connection and observe the console output.
 
-## License
-
-Apache License v2
 
 ## Autor
 
