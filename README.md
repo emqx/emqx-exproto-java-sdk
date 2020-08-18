@@ -161,7 +161,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
         Erlang.call("emqx_exproto", "publish", new Object[]{connection.getPid(), DeliverMessage.toErlangDataType(message)}, 5000);
     }
 ```
-### 5. subscribeTopic
+### 5. subscribe
 ```java
   /**
      * SDK provide function:
