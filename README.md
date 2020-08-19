@@ -116,7 +116,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      * @param connection Connection Pid (from erlang data type).
      * @param data       Your message data byte arr.
      */
-    public void send(Connection connection, byte[] data) throws Exception {
+    public static void send(Connection connection, byte[] data) throws Exception {
         Erlang.call("emqx_exproto", "send", new Object[]{connection.getPid(), new Binary(data)}, 5000);
     }
 ```
@@ -128,7 +128,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      *
      * @param connection Connection Pid (from erlang data type).
      */
-    public void terminate(Connection connection) throws Exception {
+    public static void terminate(Connection connection) throws Exception {
         Erlang.call("emqx_exproto", "close", new Object[]{connection.getPid()}, 5000);
     }
 
@@ -143,7 +143,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      * @param connection Connection Pid (from erlang data type).
      * @param clientInfo client information, include protocol name, protocol version ,client Id,username,mount point,keep alive time.
      */
-    public void register(Connection connection, ClientInfo clientInfo) throws Exception {
+    public static void register(Connection connection, ClientInfo clientInfo) throws Exception {
         Erlang.call("emqx_exproto", "register", new Object[]{connection.getPid(), ClientInfo.toErlangDataType(clientInfo)}, 5000);
     }
 ```
@@ -157,7 +157,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      * @param connection Connection Pid (from erlang data type).
      * @param message    Message information,include message id,qos,from,topic,payload,timestamp.
      */
-    public void publish(Connection connection, DeliverMessage message) throws Exception {
+    public static void publish(Connection connection, DeliverMessage message) throws Exception {
         Erlang.call("emqx_exproto", "publish", new Object[]{connection.getPid(), DeliverMessage.toErlangDataType(message)}, 5000);
     }
 ```
@@ -171,7 +171,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      * @param topic      Topic name.
      * @param qos        qos.
      */
-    public void subscribe(Connection connection, String topic, int qos) throws Exception {
+    public static void subscribe(Connection connection, String topic, int qos) throws Exception {
         Erlang.call("emqx_exproto", "subscribe", new Object[]{connection.getPid(), new Binary(topic), qos}, 5000);
     }
 ```
