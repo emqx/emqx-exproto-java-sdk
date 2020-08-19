@@ -30,91 +30,107 @@ public abstract class AbstractExProtoHandler extends ExProto {
 
 
     /**
-     * call back function :
-     * Client connect to EMQ X broker.
+     * A connection established.
      *
-     * @param connection     Connection Pid (from erlang data type).
-     * @param connectionInfo Client information ; include socket type,socket name,peer name,peer cert.
+     * This function will be scheduled after a TCP connection established to EMQ X
+     * or receive a new UDP socket.
+     *
+     * @param connection     The Connection instance
+     * @param connectionInfo The Connection information
      */
     public abstract void onConnectionEstablished(Connection connection, ConnectionInfo connectionInfo);
 
     /**
-     * call back function:
-     * Message data from client.
+     * A connection received bytes.
      *
-     * @param connection Connection Pid (from erlang data type).
-     * @param data       byte arr.
+     * This callback will be scheduled when a connection received bytes from TCP/UDP socket.
+     *
+     * @param connection The Connection instance
+     * @param data       The bytes array
      */
     public abstract void onConnectionReceived(Connection connection, byte[] data);
 
     /**
-     * call back function:
-     * Client connection terminated .
+     * A connection terminated.
      *
-     * @param connection Connection Pid (from erlang data type).
-     * @param reason     String bytes;
+     * This function will be scheduled after a connection terminated.
+     *
+     * It indicates that the EMQ X process that maintains the TCP/UDP socket
+     * has been closed. E.g: a TCP connection is closed, or a UDP socket has
+     * exceeded maintenance hours.
+     *
+     * @param connection The Connection instance
+     * @param reason     The Connection terminated reason
      */
     public abstract void onConnectionTerminated(Connection connection, byte[] reason);
 
     /**
-     * call back function:
-     * Receive message from subscribed topic.
+     * A connection received a serial of messages from subscribed topic.
      *
-     * @param connection  Connection Pid (from erlang data type).
-     * @param messagesArr String bytes;
+     * This function will be scheduled when a connection received a Message from EMQ X
+     *
+     * When a connection is subscribed to a topic and a message arrives on that topic,
+     * EMQ X will deliver the message to that connection. At that time, this function
+     * is triggered.
+     *
+     * @param connection  The Connection instance
+     * @param messagesArr The message array
      */
     public abstract void onConnectionDeliver(Connection connection, DeliverMessage[] messagesArr);
 
     /**
-     * SDK provide function:
-     * Send message to client connection
+     * Send a stream of bytes to the connection.
      *
-     * @param connection Connection Pid (from erlang data type).
-     * @param data       Your message data byte arr.
+     * These bytes are delivered directly to the associated TCP/UDP socket.
+     *
+     * @param connection The Connection instance
+     * @param data       The bytes
      */
     public static void send(Connection connection, byte[] data) throws Exception {
         Erlang.call("emqx_exproto", "send", new Object[]{connection.getPid(), new Binary(data)}, 5000);
     }
 
     /**
-     * SDK provide function:
-     * Terminate client connection.
+     * Terminate the connection process and TCP/UDP socket.
      *
-     * @param connection Connection Pid (from erlang data type).
+     * @param connection The Connection instance
      */
     public static void terminate(Connection connection) throws Exception {
         Erlang.call("emqx_exproto", "close", new Object[]{connection.getPid()}, 5000);
     }
 
     /**
-     * SDK provide function:
-     * Register a client in EMQ X Broker.
+     * Register the connection as a Client of EMQ X.
      *
-     * @param connection Connection Pid (from erlang data type).
-     * @param clientInfo client information, include protocol name, protocol version ,client Id,username,mount point,keep alive time.
+     * This `clientInfo` contains the necessary field information to be an EMQ X client.
+     *
+     * This method should normally be invoked after confirming that a connection is
+     * allowed to access the EMQ X system. For example: after the connection packet
+     * has been parsed and authenticated successfully.
+     *
+     * @param connection Then Connection instance
+     * @param clientInfo The Client information
      */
     public static void register(Connection connection, ClientInfo clientInfo) throws Exception {
         Erlang.call("emqx_exproto", "register", new Object[]{connection.getPid(), ClientInfo.toErlangDataType(clientInfo)}, 5000);
     }
 
     /**
-     * SDK provide function:
-     * Publish message to EMQ X Broker
+     * The connection Publish a Message to EMQ X
      *
-     * @param connection Connection Pid (from erlang data type).
-     * @param message    Message information,include message id,qos,from,topic,payload,timestamp.
+     * @param connection The Connection instance
+     * @param message    The Message
      */
     public static void publish(Connection connection, DeliverMessage message) throws Exception {
         Erlang.call("emqx_exproto", "publish", new Object[]{connection.getPid(), DeliverMessage.toErlangDataType(message)}, 5000);
     }
 
     /**
-     * SDK provide function:
-     * Subscribe topic in EMQ X Broker
+     * The connection Subscribe a Topic to EMQ X
      *
-     * @param connection Connection Pid (from erlang data type).
-     * @param topic      Topic name.
-     * @param qos        qos.
+     * @param connection The Connection instance
+     * @param topic      The Topic name.
+     * @param qos        The subscribed QoS level, available value: 0, 1, 2.
      */
     public static void subscribe(Connection connection, String topic, int qos) throws Exception {
         Erlang.call("emqx_exproto", "subscribe", new Object[]{connection.getPid(), new Binary(topic), qos}, 5000);
@@ -123,5 +139,4 @@ public abstract class AbstractExProtoHandler extends ExProto {
     public static void loadExProtoHandler(AbstractExProtoHandler handler) {
         loadExProtoHandler(handler);
     }
-
 }
