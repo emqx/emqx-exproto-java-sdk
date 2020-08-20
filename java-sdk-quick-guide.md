@@ -1,4 +1,4 @@
-# 	Java SDK 快速入门
+# Java SDK 快速入门
 
 我们提供了 Java 语言适用的 SDK，以帮助快速、方便地开发 Java 语言的 EMQ X 扩展。
 
@@ -8,13 +8,13 @@
 
 2. 在 IDE 中创建 Java 项目，将 `emqx-exproto-java-sdk.jar` 和`erlport.jar`作为依赖引入该项目。
 
-下载依赖：[emqx-exproto-java-sdk.jar](https://github.com/emqx/emqx-exproto-java-sdk/)
-
+下载依赖：[emqx-exproto-java-sdk.jar](https://github.com/emqx/emqx-exproto-java-sdk/releases)
 
 
 ## 示例
 
-我们提供了 [ExProtoHandlerDemo.java](https://github.com/emqx/emqx-exproto-java-sdk/blob/master/example/ExProtoHandlerDemo.java) 示例程序，
+我们提供了 [ExProtoHandlerDemo.java](https://github.com/emqx/emqx-exproto-java-sdk/blob/master/example/ExProtoHandlerDemo.java) 示例程序。
+
 该程序继承自 SDK 中的 `AbstractExProtoHandler` 类。
 
 ```java
@@ -104,20 +104,21 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
 
 ```
 示例中实现了4个回调函数，分别处理以下事件：
-| 函数                    | 回调事件                   |
-| ----------------------- | -------------------------- |
-| onConnectionEstablished | 终端建立连接               |
-| onConnectionReceived    | 终端发送消息至EMQ X Borker |
-| onConnectionTerminated  | 终端断开连接               |
-| onConnectionDeliver     | EMQ X Broker订阅消息       |
+
+| 函数                    | 回调事件                         |
+| ----------------------- | -------------------------------- |
+| onConnectionEstablished | 客户端连接建立成功               |
+| onConnectionReceived    | 客户端连接接收到 Socket 字节数据 |
+| onConnectionTerminated  | 客户端连接已断开                 |
+| onConnectionDeliver     | 收到 EMQ X 投递给该客户端的消息  |
 
 ## SDK
 
-`AbstractExProtoHandler`类中，提供了以下方法：
+`AbstractExProtoHandler` 类中，提供了以下方法：
 
 #### send
 
-发送数据至终端连接：
+发送数据至客户端连接：
 
 ```java
    /**
@@ -130,9 +131,10 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      */
     public static void send(Connection connection, byte[] data) throws Exception;
 ```
-####  terminate
 
-结束终端连接：
+#### terminate
+
+结束客户端连接：
 
 ```java
     /**
@@ -141,11 +143,11 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
       * @param connection The Connection instance
       */
     public static void terminate(Connection connection) throws Exception;
-
 ```
-####  register
 
-注册终端信息：
+#### register
+
+注册客户端信息：
 
 ```java
    /**
@@ -165,7 +167,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
 
 #### publish
 
-推送消息：
+发布消息：
 
 ```java
     /**
@@ -178,7 +180,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
 ```
 #### subscribe
 
-订阅Topic：
+订阅主题：
 
 ```java
     /**
@@ -190,28 +192,27 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
       */
     public static void subscribe(Connection connection, String topic, int qos) throws Exception ;
 ```
+
 ### 不允许重写的SDK方法
-以下方法在AbstractExProtoHandler的父类ExProto中被声明，重写这些方法会导致不可知的错误。
+
+以下方法在 `AbstractExProtoHandler` 的父类 `ExProto中` 被声明，重写这些方法会导致不可知的错误。
+
 ```java
 loadExProtoHandler(AbstractExProtoHandler exprotoHandler)
-```
-```java
+
 init(Object conn, Object connInfo)
-```
-```java
+
 terminated(Object conn, Object reason, Object state)
-```
-```java
+
 received(Object conn, Object data, Object state)
-```
-```java
+
 deliver(Object conn, Object msgs0, Object state)
 ```
 ### 数据封装
 
 #### Connection
 
-​	连接：
+客户端连接对象：
 
 | Attribute | Type                         |
 | --------- | :--------------------------- |
@@ -223,7 +224,7 @@ deliver(Object conn, Object msgs0, Object state)
 
 #### ClientInfo
 
-终端信息：
+客户端信息：
 
 | Attribute    | Type   |
 | ------------ | ------ |
@@ -236,7 +237,7 @@ deliver(Object conn, Object msgs0, Object state)
 
 #### ConnectionInfo
 
-连接信息：
+客户端连接信息：
 
 | Attribute    | Type                       |
 | ------------ | -------------------------- |
@@ -251,7 +252,7 @@ deliver(Object conn, Object msgs0, Object state)
 
 #### Message
 
-EMQ X Broker Message
+消息：
 
 | Attribute | Type   |
 | --------- | ------ |
@@ -263,19 +264,18 @@ EMQ X Broker Message
 | timestamp | int    |
 
 
-
 ## 部署
 
 在完成开发后，需要将 Java 的代码内容部署到 EMQ X 中：
 
 1. 编译扩展程序，将生成的 `.class`  文件（含包结构） 和 SDK 本身的 Jar 包
-   拷贝至 EMQ X 安装目录下的 `data/javaexprotodemo` 目录下。
+   拷贝至 EMQ X 安装目录下的 `data/extension` 目录下。
 2. 修改 EMQ X 的 `emqx/etc/plugins/emqx_exproto.conf` 配置文件：
 
 ``` properties
 exproto.listener.protoname = tcp://0.0.0.0:7993
 exproto.listener.protoname.driver = java
-exproto.listener.protoname.driver_search_path = data/javaexprotodemo
+exproto.listener.protoname.driver_search_path = data/extension
 exproto.listener.protoname.driver_callback_module = ExProtoHandlerDemo
 ```
 
@@ -292,4 +292,5 @@ exproto.listener.protoname.driver_callback_module = ExProtoHandlerDemo
    ```
    推荐在无参构造方法中完成，参考`ExProtoHandlerDemo` 的构造方法。
 
-3. 标准输入输出流System.in和System.out用于EMQ X系统内部的交互，请不要在扩展程序中使用。目前可以使用System.err进行控制台打印。
+3. 标准输入输出流 `System.in` 和 `System.out` 用于EMQ X 系统内部的交互，请不要在扩展程序中使用。目前可以使用 `System.err` 将日志信息打印至 EMQ X 控制台。
+
