@@ -15,7 +15,7 @@ public class ConnectionInfo {
     private String cert_cn;
     private String cert_dn;
 
-    public static ConnectionInfo praser(Object connInfo) {
+    public static ConnectionInfo parser(Object connInfo) {
         ConnectionInfo connectionInfo = new ConnectionInfo();
         ArrayList<Object> connInfoList = (ArrayList<Object>) connInfo;
         try {

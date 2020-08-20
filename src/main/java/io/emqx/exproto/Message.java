@@ -7,7 +7,7 @@ import com.erlport.erlang.term.Tuple;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class DeliverMessage {
+public class Message {
     private String id;
     private int qos;
     private String from;
@@ -15,7 +15,7 @@ public class DeliverMessage {
     private byte[] payload;
     private int timestamp;
 
-    public DeliverMessage(String id, int qos, String from, String topic, byte[] payload, int timestamp) {
+    public Message(String id, int qos, String from, String topic, byte[] payload, int timestamp) {
         this.id = id;
         this.qos = qos;
         this.from = from;
@@ -24,20 +24,20 @@ public class DeliverMessage {
         this.timestamp = timestamp;
     }
 
-    public static DeliverMessage[] praser(Object msgObj) {
-        ArrayList<DeliverMessage> deliverMessageArrayList = new ArrayList<>();
+    public static Message[] parser(Object msgObj) {
+        ArrayList<Message> messageArrayList = new ArrayList<>();
         if (msgObj instanceof ArrayList) {
             ArrayList<Object> messageDetailList_list = (ArrayList<Object>) msgObj;
             for (Object o : messageDetailList_list) {
                 ArrayList<Object>messageDetailList = (ArrayList<Object> ) o;
-                deliverMessageArrayList.add(praserOne(messageDetailList.toArray(new Tuple[6])));
+                messageArrayList.add(praserOne(messageDetailList.toArray(new Tuple[6])));
             }
         }
-        return deliverMessageArrayList.toArray(new DeliverMessage[deliverMessageArrayList.size()]);
+        return messageArrayList.toArray(new Message[messageArrayList.size()]);
     }
 
-    private static DeliverMessage praserOne(Tuple[] messgaeTuplesArr) {
-        DeliverMessage deliverMessage = new DeliverMessage();
+    private static Message praserOne(Tuple[] messgaeTuplesArr) {
+        Message message = new Message();
         for (Tuple tuple : messgaeTuplesArr) {
             Atom key = (Atom) tuple.get(0);
             Object value = tuple.get(1);
@@ -45,44 +45,44 @@ public class DeliverMessage {
             switch (key.value) {
                 case "id":
                     value_b = (Binary) value;
-                    deliverMessage.setId(new String(value_b.raw));
+                    message.setId(new String(value_b.raw));
                     break;
                 case "qos":
-                    deliverMessage.setQos((int) value);
+                    message.setQos((int) value);
                     break;
                 case "from":
                     value_b = (Binary) value;
-                    deliverMessage.setFrom(new String(value_b.raw));
+                    message.setFrom(new String(value_b.raw));
                     break;
                 case "topic":
                     value_b = (Binary) value;
-                    deliverMessage.setTopic(new String(value_b.raw));
+                    message.setTopic(new String(value_b.raw));
                     break;
                 case "payload":
                     value_b = (Binary) value;
-                    deliverMessage.setPayload(value_b.raw);
+                    message.setPayload(value_b.raw);
                     break;
                 case "timestamp":
-                    deliverMessage.setTimestamp((int) value);
+                    message.setTimestamp((int) value);
                     break;
             }
         }
-        return deliverMessage;
+        return message;
     }
 
 
-    public static ArrayList<Tuple> toErlangDataType(DeliverMessage deliverMessage) {
+    public static ArrayList<Tuple> toErlangDataType(Message message) {
         ArrayList<Tuple> tupleArrayList = new ArrayList<>();
-        tupleArrayList.add(Tuple.two(new Atom("id"), new Binary(deliverMessage.getId())));
-        tupleArrayList.add(Tuple.two(new Atom("qos"), deliverMessage.getQos()));
-        tupleArrayList.add(Tuple.two(new Atom("from"), new Binary(deliverMessage.getFrom())));
-        tupleArrayList.add(Tuple.two(new Atom("topic"), new Binary(deliverMessage.getTopic())));
-        tupleArrayList.add(Tuple.two(new Atom("payload"), new Binary(deliverMessage.getPayload())));
-        tupleArrayList.add(Tuple.two(new Atom("timestamp"), deliverMessage.getTimestamp()));
+        tupleArrayList.add(Tuple.two(new Atom("id"), new Binary(message.getId())));
+        tupleArrayList.add(Tuple.two(new Atom("qos"), message.getQos()));
+        tupleArrayList.add(Tuple.two(new Atom("from"), new Binary(message.getFrom())));
+        tupleArrayList.add(Tuple.two(new Atom("topic"), new Binary(message.getTopic())));
+        tupleArrayList.add(Tuple.two(new Atom("payload"), new Binary(message.getPayload())));
+        tupleArrayList.add(Tuple.two(new Atom("timestamp"), message.getTimestamp()));
         return tupleArrayList;
     }
 
-    public DeliverMessage() {
+    public Message() {
     }
 
     public String getId() {
