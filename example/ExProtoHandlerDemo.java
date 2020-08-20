@@ -14,23 +14,14 @@ import io.emqx.exproto.*;
  * load your AbstractExProtoHandler in the "Nonparametric construction method".
  */
 public class ExProtoHandlerDemo extends AbstractExProtoHandler {
-
-    public ExProtoHandlerDemo() {
-        ExProto.loadExProtoHandler(new ExProtoHandlerDemo(new String[]{"Don't use System.in.*", "Don't use System.out.*"}));
-    }
-
-    public ExProtoHandlerDemo(String[] args) {
-        for (String arg : args) {
-            System.err.println(arg);
-        }
-    }
-
     /**
-     * call back function :
-     * Client connect to EMQ X broker.
+     * A connection established.
+     * <p>
+     * This function will be scheduled after a TCP connection established to EMQ X
+     * or receive a new UDP socket.
      *
-     * @param connection     Connection Pid (from erlang data type).
-     * @param connectionInfo Client information ; include socket type,socket name,peer name,peer cert.
+     * @param connection     The Connection instance
+     * @param connectionInfo The Connection information
      */
     @Override
     public void onConnectionEstablished(Connection connection, ConnectionInfo connectionInfo) {
@@ -39,11 +30,12 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
     }
 
     /**
-     * call back function:
-     * Message data from client.
+     * A connection received bytes.
+     * <p>
+     * This callback will be scheduled when a connection received bytes from TCP/UDP socket.
      *
-     * @param connection Connection Pid (from erlang data type).
-     * @param data       byte arr.
+     * @param connection The Connection instance
+     * @param data       The bytes array
      */
     @Override
     public void onConnectionReceived(Connection connection, byte[] data) {
@@ -52,30 +44,40 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
     }
 
     /**
-     * call back function:
-     * Client connection terminated .
+     * A connection terminated.
+     * <p>
+     * This function will be scheduled after a connection terminated.
+     * <p>
+     * It indicates that the EMQ X process that maintains the TCP/UDP socket
+     * has been closed. E.g: a TCP connection is closed, or a UDP socket has
+     * exceeded maintenance hours.
      *
-     * @param connection Connection Pid (from erlang data type).
-     * @param reason     String bytes;
+     * @param connection The Connection instance
+     * @param reason     The Connection terminated reason
      */
     @Override
-    public void onConnectionTerminated(Connection connection, byte[] reason) {
+    public void onConnectionTerminated(Connection connection, String reason) {
         System.err.println(connection);
-        System.err.println(new String(reason));
+        System.err.println(reason);
     }
 
     /**
-     * call back function:
-     * Receive message from subscribed topic.
+     * A connection received a serial of messages from subscribed topic.
+     * <p>
+     * This function will be scheduled when a connection received a Message from EMQ X
+     * <p>
+     * When a connection is subscribed to a topic and a message arrives on that topic,
+     * EMQ X will deliver the message to that connection. At that time, this function
+     * is triggered.
      *
-     * @param connection  Connection Pid (from erlang data type).
-     * @param messagesArr String bytes;
+     * @param connection  The Connection instance
+     * @param messagesArr The message array
      */
     @Override
-    public void onConnectionDeliver(Connection connection, DeliverMessage[] messagesArr) {
+    public void onConnectionDeliver(Connection connection, Message[] messagesArr) {
         System.err.println(connection);
-        for (DeliverMessage deliverMessage : messagesArr) {
-            System.err.println(deliverMessage);
+        for (Message message : messagesArr) {
+            System.err.println(message);
         }
     }
 }

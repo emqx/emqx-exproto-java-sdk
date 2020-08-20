@@ -31,7 +31,7 @@ public abstract class AbstractExProtoHandler extends ExProto {
 
     /**
      * A connection established.
-     *
+     * <p>
      * This function will be scheduled after a TCP connection established to EMQ X
      * or receive a new UDP socket.
      *
@@ -42,7 +42,7 @@ public abstract class AbstractExProtoHandler extends ExProto {
 
     /**
      * A connection received bytes.
-     *
+     * <p>
      * This callback will be scheduled when a connection received bytes from TCP/UDP socket.
      *
      * @param connection The Connection instance
@@ -52,9 +52,9 @@ public abstract class AbstractExProtoHandler extends ExProto {
 
     /**
      * A connection terminated.
-     *
+     * <p>
      * This function will be scheduled after a connection terminated.
-     *
+     * <p>
      * It indicates that the EMQ X process that maintains the TCP/UDP socket
      * has been closed. E.g: a TCP connection is closed, or a UDP socket has
      * exceeded maintenance hours.
@@ -62,13 +62,13 @@ public abstract class AbstractExProtoHandler extends ExProto {
      * @param connection The Connection instance
      * @param reason     The Connection terminated reason
      */
-    public abstract void onConnectionTerminated(Connection connection, byte[] reason);
+    public abstract void onConnectionTerminated(Connection connection, String reason);
 
     /**
      * A connection received a serial of messages from subscribed topic.
-     *
+     * <p>
      * This function will be scheduled when a connection received a Message from EMQ X
-     *
+     * <p>
      * When a connection is subscribed to a topic and a message arrives on that topic,
      * EMQ X will deliver the message to that connection. At that time, this function
      * is triggered.
@@ -76,11 +76,11 @@ public abstract class AbstractExProtoHandler extends ExProto {
      * @param connection  The Connection instance
      * @param messagesArr The message array
      */
-    public abstract void onConnectionDeliver(Connection connection, DeliverMessage[] messagesArr);
+    public abstract void onConnectionDeliver(Connection connection, Message[] messagesArr);
 
     /**
      * Send a stream of bytes to the connection.
-     *
+     * <p>
      * These bytes are delivered directly to the associated TCP/UDP socket.
      *
      * @param connection The Connection instance
@@ -101,9 +101,9 @@ public abstract class AbstractExProtoHandler extends ExProto {
 
     /**
      * Register the connection as a Client of EMQ X.
-     *
+     * <p>
      * This `clientInfo` contains the necessary field information to be an EMQ X client.
-     *
+     * <p>
      * This method should normally be invoked after confirming that a connection is
      * allowed to access the EMQ X system. For example: after the connection packet
      * has been parsed and authenticated successfully.
@@ -121,8 +121,8 @@ public abstract class AbstractExProtoHandler extends ExProto {
      * @param connection The Connection instance
      * @param message    The Message
      */
-    public static void publish(Connection connection, DeliverMessage message) throws Exception {
-        Erlang.call("emqx_exproto", "publish", new Object[]{connection.getPid(), DeliverMessage.toErlangDataType(message)}, 5000);
+    public static void publish(Connection connection, Message message) throws Exception {
+        Erlang.call("emqx_exproto", "publish", new Object[]{connection.getPid(), Message.toErlangDataType(message)}, 5000);
     }
 
     /**

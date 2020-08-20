@@ -20,7 +20,7 @@ public class ExProto {
 
     public static Object init(Object conn, Object connInfo) {
         Pid connPid = (Pid) conn;
-        ConnectionInfo E = ConnectionInfo.praser(connInfo);
+        ConnectionInfo E = ConnectionInfo.parser(connInfo);
         exprotoHandler.onConnectionEstablished(new Connection(connPid), E);
         Object state = new State();
         return Tuple.two(OK, state);
@@ -29,7 +29,7 @@ public class ExProto {
     public static void terminated(Object conn, Object reason, Object state) {
         Pid connPid = (Pid) conn;
         Binary reasonBinary = (Binary) reason;
-        exprotoHandler.onConnectionTerminated(new Connection(connPid), reasonBinary.raw);
+        exprotoHandler.onConnectionTerminated(new Connection(connPid), new String(reasonBinary.raw));
     }
 
     public static Object received(Object conn, Object data, Object state) {
@@ -42,7 +42,7 @@ public class ExProto {
 
     public static Object deliver(Object conn, Object msgs0, Object state) {
         Pid connPid = (Pid) conn;
-        exprotoHandler.onConnectionDeliver(new Connection(connPid), DeliverMessage.praser(msgs0));
+        exprotoHandler.onConnectionDeliver(new Connection(connPid), Message.parser(msgs0));
         return Tuple.two(OK, state);
     }
 
