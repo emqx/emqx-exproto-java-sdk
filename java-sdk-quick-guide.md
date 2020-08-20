@@ -6,7 +6,7 @@
 
 1. 建议 JDK 1.8 及以上。
 
-2. 在 IDE 中创建 Java 项目，将 `io.emqx.extension.jar` 和`erlport.jar`作为依赖引入该项目。
+2. 在 IDE 中创建 Java 项目，将 `emqx-exproto-java-sdk.jar` 和`erlport.jar`作为依赖引入该项目。
 
 下载依赖：[emqx-exproto-java-sdk.jar](https://github.com/emqx/emqx-exproto-java-sdk/)
 
