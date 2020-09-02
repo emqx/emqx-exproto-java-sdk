@@ -14,6 +14,20 @@ import io.emqx.exproto.*;
  * load your AbstractExProtoHandler in the "Nonparametric construction method".
  */
 public class ExProtoHandlerDemo extends AbstractExProtoHandler {
+
+    private static ExProtoHandlerDemo exProtoHandlerDemo = new ExProtoHandlerDemo(new String[]{"Don't use [System.in.*] or [System.out.*]"});
+
+    public ExProtoHandlerDemo() {
+        ExProto.loadExProtoHandler(exProtoHandlerDemo);
+    }
+
+    public ExProtoHandlerDemo(String[] args) {
+        for (String arg : args) {
+            //use [System.err.*] is fine
+            System.err.println(arg);
+        }
+    }
+
     /**
      * A connection established.
      * <p>
