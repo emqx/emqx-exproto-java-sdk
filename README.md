@@ -8,7 +8,7 @@
 ## Get Started
 
 1. First of all, create your Java project.
-2. 2. Download the [emqx-exproto-java-sdk.jar](https://github.com/emqx/emqx-exproto-java-sdk/raw/master/build/emqx-exproto-java-sdk.jar) and [erlport.jar](https://github.com/emqx/emqx-exproto-java-sdk/raw/master/src/lib/erlport.jar)
+2. Download the [emqx-exproto-java-sdk.jar](https://github.com/emqx/emqx-exproto-java-sdk/raw/master/build/emqx-exproto-java-sdk.jar) and [erlport.jar](https://github.com/emqx/emqx-exproto-java-sdk/raw/master/src/lib/erlport.jar)
 3. Add `emqx-exproto-java-sdk.jar` and `erlport.jar` to your project dependency.
 4. Copy `example/ExProtoHandlerDemo.java` into your project.
 5. Try to compile your project.
