@@ -13,9 +13,9 @@ public class Message {
     private String from;
     private String topic;
     private byte[] payload;
-    private int timestamp;
+    private long timestamp;
 
-    public Message(String id, int qos, String from, String topic, byte[] payload, int timestamp) {
+    public Message(String id, int qos, String from, String topic, byte[] payload, long timestamp) {
         this.id = id;
         this.qos = qos;
         this.from = from;
@@ -29,16 +29,16 @@ public class Message {
         if (msgObj instanceof ArrayList) {
             ArrayList<Object> messageDetailList_list = (ArrayList<Object>) msgObj;
             for (Object o : messageDetailList_list) {
-                ArrayList<Object>messageDetailList = (ArrayList<Object> ) o;
-                messageArrayList.add(praserOne(messageDetailList.toArray(new Tuple[6])));
+                ArrayList<Object> messageDetailList = (ArrayList<Object>) o;
+                messageArrayList.add(parserOne(messageDetailList.toArray(new Tuple[6])));
             }
         }
         return messageArrayList.toArray(new Message[messageArrayList.size()]);
     }
 
-    private static Message praserOne(Tuple[] messgaeTuplesArr) {
+    private static Message parserOne(Tuple[] messageTuplesArr) {
         Message message = new Message();
-        for (Tuple tuple : messgaeTuplesArr) {
+        for (Tuple tuple : messageTuplesArr) {
             Atom key = (Atom) tuple.get(0);
             Object value = tuple.get(1);
             Binary value_b;
@@ -63,7 +63,7 @@ public class Message {
                     message.setPayload(value_b.raw);
                     break;
                 case "timestamp":
-                    message.setTimestamp((int) value);
+                    message.setTimestamp((long) value);
                     break;
             }
         }
@@ -125,11 +125,11 @@ public class Message {
         this.payload = payload;
     }
 
-    public int getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(int timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
