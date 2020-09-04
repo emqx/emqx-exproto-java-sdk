@@ -4,6 +4,7 @@ import com.erlport.erlang.term.Atom;
 import com.erlport.erlang.term.Binary;
 import com.erlport.erlang.term.Tuple;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -13,9 +14,9 @@ public class Message {
     private String from;
     private String topic;
     private byte[] payload;
-    private long timestamp;
+    private BigInteger timestamp;
 
-    public Message(String id, int qos, String from, String topic, byte[] payload, long timestamp) {
+    public Message(String id, int qos, String from, String topic, byte[] payload, BigInteger timestamp) {
         this.id = id;
         this.qos = qos;
         this.from = from;
@@ -63,7 +64,7 @@ public class Message {
                     message.setPayload(value_b.raw);
                     break;
                 case "timestamp":
-                    message.setTimestamp((long) value);
+                    message.setTimestamp((BigInteger) value);
                     break;
             }
         }
@@ -125,11 +126,11 @@ public class Message {
         this.payload = payload;
     }
 
-    public long getTimestamp() {
+    public BigInteger getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(BigInteger timestamp) {
         this.timestamp = timestamp;
     }
 
