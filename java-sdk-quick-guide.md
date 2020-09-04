@@ -272,14 +272,14 @@ Peer cert
 
 EMQ X Broker Message
 
-| Attribute | Type   |
-| --------- | ------ |
-| id        | String |
-| qos       | int    |
-| from      | String |
-| topic     | String |
-| payload   | byte[] |
-| timestamp | int    |
+| Attribute | Type       |
+| --------- | ---------- |
+| id        | String     |
+| qos       | int        |
+| from      | String     |
+| topic     | String     |
+| payload   | byte[]     |
+| timestamp | BigInteger |
 
 
 
