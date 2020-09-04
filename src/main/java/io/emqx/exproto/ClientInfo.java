@@ -10,18 +10,18 @@ public class ClientInfo {
     private String protoName;
     private String protoVersion;
     private String clientId;
-    private String userName;
-    private String mountPoint;
-    private int keepAlive;
+    private String username;
+    private String mountpoint;
+    private int keepalive;
 
 
-    public ClientInfo(String protoName, String protoVersion, String clientId, String userName, String mountPoint, int keepAlive) {
+    public ClientInfo(String protoName, String protoVersion, String clientId, String username, String mountpoint, int keepalive) {
         this.protoName = protoName;
         this.setProtoVersion(protoVersion);
         this.clientId = clientId;
-        this.userName = userName;
-        this.mountPoint = mountPoint;
-        this.keepAlive = keepAlive;
+        this.username = username;
+        this.mountpoint = mountpoint;
+        this.keepalive = keepalive;
     }
 
     public static ArrayList<Tuple> toErlangDataType(ClientInfo clientInfo) {
@@ -29,9 +29,9 @@ public class ClientInfo {
         clientInfoList.add(Tuple.two(new Atom("proto_name"), new Binary(clientInfo.getProtoName())));
         clientInfoList.add(Tuple.two(new Atom("proto_ver"), new Binary(clientInfo.getProtoVersion())));
         clientInfoList.add(Tuple.two(new Atom("clientid"), new Binary(clientInfo.getClientId())));
-        clientInfoList.add(Tuple.two(new Atom("username"), new Binary(clientInfo.getUserName())));
-        clientInfoList.add(Tuple.two(new Atom("mountpoint"), new Binary(clientInfo.getMountPoint())));
-        clientInfoList.add(Tuple.two(new Atom("keepalive"), clientInfo.getKeepAlive()));
+        clientInfoList.add(Tuple.two(new Atom("username"), new Binary(clientInfo.getUsername())));
+        clientInfoList.add(Tuple.two(new Atom("mountpoint"), new Binary(clientInfo.getMountpoint())));
+        clientInfoList.add(Tuple.two(new Atom("keepalive"), clientInfo.getKeepalive()));
         return clientInfoList;
     }
 
@@ -62,28 +62,28 @@ public class ClientInfo {
         this.clientId = clientId;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public String getMountPoint() {
-        return mountPoint;
+    public String getMountpoint() {
+        return mountpoint;
     }
 
-    public void setMountPoint(String mountPoint) {
-        this.mountPoint = mountPoint;
+    public void setMountpoint(String mountpoint) {
+        this.mountpoint = mountpoint;
     }
 
-    public int getKeepAlive() {
-        return keepAlive;
+    public int getKeepalive() {
+        return keepalive;
     }
 
-    public void setKeepAlive(int keepAlive) {
-        this.keepAlive = keepAlive;
+    public void setKeepalive(int keepalive) {
+        this.keepalive = keepalive;
     }
 
     @Override
@@ -92,9 +92,9 @@ public class ClientInfo {
                 "protoName='" + protoName + '\'' +
                 ", protoVersion='" + protoVersion + '\'' +
                 ", clientId='" + clientId + '\'' +
-                ", userName='" + userName + '\'' +
-                ", mountPoint='" + mountPoint + '\'' +
-                ", keepAlive=" + keepAlive +
+                ", userName='" + username + '\'' +
+                ", mountPoint='" + mountpoint + '\'' +
+                ", keepAlive=" + keepalive +
                 '}';
     }
 }
