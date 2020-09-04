@@ -7,13 +7,11 @@ import java.util.ArrayList;
 
 public class ConnectionInfo {
     private SocketType socketType;
-    private String socketIP;
-    private int socketPort;
-    private String peerNameIp;
-    private int peerNamePort;
-    private String cert;
-    private String cert_cn;
-    private String cert_dn;
+    private String socketnameIP;
+    private int socketnamePort;
+    private String peernameIP;
+    private int peernamePort;
+    private Peercert peercert = null;
 
     public static ConnectionInfo parser(Object connInfo) {
         ConnectionInfo connectionInfo = new ConnectionInfo();
@@ -39,8 +37,8 @@ public class ConnectionInfo {
                                 }
                             }
                             int peername_Port = (int) peernameTupleOutSide.get(1);
-                            connectionInfo.setPeerNameIp(peerNameBuilder.toString());
-                            connectionInfo.setPeerNamePort(peername_Port);
+                            connectionInfo.setPeernameIP(peerNameBuilder.toString());
+                            connectionInfo.setPeernamePort(peername_Port);
                             break;
                         case "sockname":
                             Tuple socketnameTupleOutSide = (Tuple) tupleElement.get(1);
@@ -53,20 +51,18 @@ public class ConnectionInfo {
                                 }
                             }
                             int socketname_Port = (int) socketnameTupleOutSide.get(1);
-                            connectionInfo.setSocketIP(socketIpBuilder.toString());
-                            connectionInfo.setSocketPort(socketname_Port);
+                            connectionInfo.setSocketnameIP(socketIpBuilder.toString());
+                            connectionInfo.setSocketnamePort(socketname_Port);
                             break;
                         case "peercert":
                             Object certKeyObj = tupleElement.get(1);
-                            if (certKeyObj instanceof Atom) {
-                                connectionInfo.setCert("nossl");
-                            }
                             if (certKeyObj instanceof ArrayList) {
                                 ArrayList<Object> cert_list = (ArrayList<Object>) certKeyObj;
                                 Tuple cert_cn_Tuple = (Tuple) cert_list.get(0);
-                                Tuple cert_dn_Tuple = (Tuple) cert_list.get(0);
-                                connectionInfo.setCert_cn(cert_cn_Tuple.get(1).toString());
-                                connectionInfo.setCert_dn(cert_dn_Tuple.get(1).toString());
+                                Tuple cert_dn_Tuple = (Tuple) cert_list.get(1);
+                                String cert_cn = cert_cn_Tuple.get(1).toString();
+                                String cert_dn = cert_dn_Tuple.get(1).toString();
+                                connectionInfo.setPeercert(new Peercert(cert_cn, cert_dn));
                             }
                             break;
                     }
@@ -92,73 +88,55 @@ public class ConnectionInfo {
         this.socketType = socketType;
     }
 
-    public String getSocketIP() {
-        return socketIP;
+    public String getSocketnameIP() {
+        return socketnameIP;
     }
 
-    public void setSocketIP(String socketIP) {
-        this.socketIP = socketIP;
+    public void setSocketnameIP(String socketnameIP) {
+        this.socketnameIP = socketnameIP;
     }
 
-    public String getPeerNameIp() {
-        return peerNameIp;
+    public String getPeernameIP() {
+        return peernameIP;
     }
 
-    public void setPeerNameIp(String peerNameIp) {
-        this.peerNameIp = peerNameIp;
+    public void setPeernameIP(String peernameIP) {
+        this.peernameIP = peernameIP;
     }
 
-    public int getPeerNamePort() {
-        return peerNamePort;
+    public int getPeernamePort() {
+        return peernamePort;
     }
 
-    public void setPeerNamePort(int peerNamePort) {
-        this.peerNamePort = peerNamePort;
+    public void setPeernamePort(int peernamePort) {
+        this.peernamePort = peernamePort;
     }
 
-    public int getSocketPort() {
-        return socketPort;
+    public int getSocketnamePort() {
+        return socketnamePort;
     }
 
-    public void setSocketPort(int socketPort) {
-        this.socketPort = socketPort;
+    public void setSocketnamePort(int socketnamePort) {
+        this.socketnamePort = socketnamePort;
     }
 
-    public String getCert() {
-        return cert;
+    public Peercert getPeercert() {
+        return peercert;
     }
 
-    public void setCert(String cert) {
-        this.cert = cert;
-    }
-
-    public String getCert_cn() {
-        return cert_cn;
-    }
-
-    public void setCert_cn(String cert_cn) {
-        this.cert_cn = cert_cn;
-    }
-
-    public String getCert_dn() {
-        return cert_dn;
-    }
-
-    public void setCert_dn(String cert_dn) {
-        this.cert_dn = cert_dn;
+    public void setPeercert(Peercert peercert) {
+        this.peercert = peercert;
     }
 
     @Override
     public String toString() {
-        return "EmqxConnectionInfo{" +
-                ", socketType=" + socketType +
-                ", socketIP='" + socketIP + '\'' +
-                ", socketPort=" + socketPort +
-                ", peerNameIp='" + peerNameIp + '\'' +
-                ", peerNamePort=" + peerNamePort +
-                ", cert='" + cert + '\'' +
-                ", cert_cn='" + cert_cn + '\'' +
-                ", cert_dn='" + cert_dn + '\'' +
+        return "ConnectionInfo{" +
+                "socketType=" + socketType +
+                ", socketnameIP='" + socketnameIP + '\'' +
+                ", socketnamePort=" + socketnamePort +
+                ", peernameIP='" + peernameIP + '\'' +
+                ", peernamePort=" + peernamePort +
+                ", peercert=" + peercert +
                 '}';
     }
 }

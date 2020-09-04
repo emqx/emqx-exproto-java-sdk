@@ -224,7 +224,7 @@ deliver(Object conn, Object msgs0, Object state)
 
 #### Connection
 
-​	连接：
+​	连接
 
 | Attribute | Type                         |
 | --------- | :--------------------------- |
@@ -236,31 +236,37 @@ deliver(Object conn, Object msgs0, Object state)
 
 #### ClientInfo
 
-终端信息：
+终端信息
 
 | Attribute    | Type   |
 | ------------ | ------ |
 | protoName    | String |
 | protoVersion | String |
 | clientId     | String |
-| userName     | String |
-| mountPoint   | String |
-| keepAlive    | int    |
+| username     | String |
+| mountpoint   | String |
+| keepalive    | int    |
 
 #### ConnectionInfo
 
-连接信息：
+连接信息
 
-| Attribute    | Type                       |
-| ------------ | -------------------------- |
-| socketType   | io.emqx.exproto.SocketType |
-| socketIP     | String                     |
-| socketPort   | int                        |
-| peerNameIp   | String                     |
-| peerNamePort | int                        |
-| cert         | String                     |
-| cert_cn      | String                     |
-| cert_dn      | String                     |
+| Attribute      | Type                       |
+| -------------- | -------------------------- |
+| socketType     | io.emqx.exproto.SocketType |
+| socketnameIP   | String                     |
+| socketnamePort | int                        |
+| peernameIP     | String                     |
+| peernamePort   | int                        |
+| peercert       | io.emqx.exproto.Peercert   |
+
+#### Peercert
+Peer cert
+
+| Attribute | Type   |
+| --------- | ------ |
+| cert_cn   | String |
+| cert_dn   | String |
 
 #### Message
 
