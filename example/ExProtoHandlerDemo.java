@@ -1,4 +1,5 @@
-import io.emqx.exproto.*;
+import java.math.BigInteger;
+import java.util.Arrays;
 
 /**
  * EMQ X ExProto java SDK;
@@ -15,7 +16,8 @@ import io.emqx.exproto.*;
  */
 public class ExProtoHandlerDemo extends AbstractExProtoHandler {
 
-    private static ExProtoHandlerDemo exProtoHandlerDemo = new ExProtoHandlerDemo(new String[]{"Don't use [System.in.*] or [System.out.*]"});
+
+    private static ExProtoHandlerDemo exProtoHandlerDemo = new ExProtoHandlerDemo(new String[]{"don't use [System.in.*]  or [System.out.*]"});
 
     public ExProtoHandlerDemo() {
         ExProto.loadExProtoHandler(exProtoHandlerDemo);
@@ -23,10 +25,17 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
 
     public ExProtoHandlerDemo(String[] args) {
         for (String arg : args) {
-            //use [System.err.*] is fine
             System.err.println(arg);
         }
     }
+
+    String help =
+            "hello      -->     say hello to AbstractExProtoHandler\r\n" +
+                    "close      -->     close conn\r\n" +
+                    "reg        -->     register client \r\n" +
+                    "pub        -->     publish message\r\n" +
+                    "sub        -->     subscribe mytopic qos 1\r\n" +
+                    "unsub      -->     unsubscribe mytopic";
 
     /**
      * A connection established.
@@ -39,8 +48,11 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      */
     @Override
     public void onConnectionEstablished(Connection connection, ConnectionInfo connectionInfo) {
-        System.err.println(connection);
-        System.err.println(connectionInfo);
+        System.err.println("onConnectionEstablished " + connection.getPid() + "  " + connectionInfo);
+        try {
+            send(connection, help.getBytes());
+        } catch (Exception e) {
+        }
     }
 
     /**
@@ -53,8 +65,80 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      */
     @Override
     public void onConnectionReceived(Connection connection, byte[] data) {
-        System.err.println(connection);
-        System.err.println(new String(data));
+        String command = new String(data).trim();
+        System.err.println(command);
+        switch (command) {
+            case "":
+                break;
+            case "hello":
+                try {
+                    send(connection, ("hello my friend " + connection.getPid().id + "\r\n").getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            case "close":
+                try {
+                    send(connection, ("goodbye my friend " + connection.getPid().id + "\r\n").getBytes());
+                    terminate(connection);
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            case "reg":
+                try {
+                    ClientInfo clientInfo = new ClientInfo("mqtt", "3.1", "testCID", "testUname", "testMP/", 300);
+                    register(connection, clientInfo);
+                    System.err.println(ClientInfo.toErlangDataType(clientInfo));
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            case "pub":
+                try {
+                    Message message =
+                            new Message("testId", 0, "from", "mytopic", "pubmessage".getBytes(), new BigInteger("" + System.currentTimeMillis()));
+                    publish(connection, message);
+                    send(connection, ("publish " + message.toString()).getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            case "sub":
+                try {
+                    String topic = "mytopic";
+                    subscribe(connection, topic, 1);
+                    System.err.println("subscribe " + topic);
+                    send(connection, ("subscribe " + topic + " qos " + 1).getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            case "unsub":
+                try {
+                    String unSubTop = "mytopic";
+                    unsubscribe(connection, unSubTop);
+                    System.err.println("subscribe " + unSubTop);
+                    send(connection, ("unsubscribe " + unSubTop).getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+            case "help":
+                try {
+                    send(connection, help.getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            default:
+                try {
+                    send(connection, ("i don't know " + command + "\r\n").getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+        }
+
     }
 
     /**
@@ -71,8 +155,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      */
     @Override
     public void onConnectionTerminated(Connection connection, String reason) {
-        System.err.println(connection);
-        System.err.println(reason);
+        System.err.println("onConnectionTerminated " + connection.getPid() + " Reason " + reason);
     }
 
     /**
@@ -89,9 +172,11 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      */
     @Override
     public void onConnectionDeliver(Connection connection, Message[] messagesArr) {
-        System.err.println(connection);
-        for (Message message : messagesArr) {
-            System.err.println(message);
+        System.err.println("onConnectionDeliver " + connection.getPid() + "  " + Arrays.toString(messagesArr));
+        try {
+            send(connection, Arrays.toString(messagesArr).getBytes());
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
 }

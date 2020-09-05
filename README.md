@@ -3,17 +3,45 @@
 ## Requirements
 
 - JDK 1.8+
-- Depend on erlport.jar (The communication module used in emqx-extension-hook)
+
+- Depend on erlport.jar (The communication module used in emqx-exproto-java-sdk)
+
+## SDK edition & EMQ X Broker edition
+
+| SDK edition | EMQ X Broker edition |
+| ----------- | -------------------- |
+| 0.0.1       | 4.2.0                |
+| unsupport   | before 4.2.0         |
 
 ## Get Started
 
 1. First of all, create your Java project.
-2. Download the [emqx-exproto-java-sdk.jar](https://github.com/emqx/emqx-exproto-java-sdk/raw/master/build/emqx-exproto-java-sdk.jar) and [erlport.jar](https://github.com/emqx/emqx-exproto-java-sdk/raw/master/src/lib/erlport.jar)
+
+2. See `SDK edition & EMQ X Broker edition` part. Chose your SDK edition.Depends on EMQ X Broker edition.
+
+   Download the [emqx-exproto-java-sdk.jar](https://search.maven.org/search?q=emqx) and [erlport.jar](https://github.com/emqx/emqx-exproto-java-sdk/raw/master/src/lib/erlport.jar).
+
 3. Add `emqx-exproto-java-sdk.jar` and `erlport.jar` to your project dependency.
+
+   If your project is a maven project, add a dependency in your maven project `pom.xml` `<dependencies></dependencies>`.
+
+
+   ```xml
+   <dependency>
+     <groupId>io.emqx</groupId>
+     <artifactId>emqx-exproto-java-sdk</artifactId>
+     <!-- Chose your SDK edition.Depends on EMQ X Boker edition. -->
+     <!-- Change version to your chosen SDK edition -->
+     <version>version</version>
+   </dependency>
+   ```
+   Change `<version>version</version>` to your chosen SDK edition, like `<version>0.0.1</version>`.
+
 4. Copy `example/ExProtoHandlerDemo.java` into your project.
+
 5. Try to compile your project.
 
-Note: NOT read/write `System.out` and `System.in` Stream. They are used to communicate with EMQ X.
+Note: NOT read/write `System.out` and `System.in` stream. They are used to communicate with EMQ X.
 Note: Invoke `ExprotoSDK.loadExprotoHandler(AbstractExprotoHandler handler)` load your AbstractExprotoHandler in the `Nonparametric construction method`.
 
 ## Deploy
@@ -21,7 +49,9 @@ Note: Invoke `ExprotoSDK.loadExprotoHandler(AbstractExprotoHandler handler)` loa
 After compiled all source codes, you should deploy the sdk and your class files into EMQ X.
 
 1. Copy the `emqx-exproto-java-sdk.jar` to `emqx/data/extension` directory.
+
 2. Copy your class files, e.g: `ExProtoHandlerDemo.class` to `emqx/data/extension` directory.
+
 3. Modify the `emqx/etc/plugins/emqx_exproto.conf` file. e.g:
 
     ```protperties
@@ -30,12 +60,16 @@ After compiled all source codes, you should deploy the sdk and your class files 
     exproto.listener.protoname.driver_search_path = data/extension
     exproto.listener.protoname.driver_callback_module = ExProtoHandlerDemo
     ```
+    
 4. Execute `bin/emqx console` to start EMQ X and load the `emqx_exproto` plugin.
+
 5. Use `telnet 127.0.0.1 7993` to establish a TCP connection and observe the console output.
 
 ## Examples
 
-see: examples/ExProtoHandlerDemo.java
+see: [examples/ExProtoHandlerDemo.java](https://github.com/emqx/emqx-exproto-java-sdk/blob/master/example/ExProtoHandlerDemo.java).
+
+`examples/ExProtoHandlerDemo.java` useage see [java-sdk-quick-guide.md](https://github.com/emqx/emqx-exproto-java-sdk/blob/master/java-sdk-quick-guide.md).
 
 ## Interface
 
