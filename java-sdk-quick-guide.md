@@ -8,16 +8,47 @@
 
 2. 在 IDE 中创建 Java 项目，将 `emqx-exproto-java-sdk.jar` 和`erlport.jar`作为依赖引入该项目。
 
-下载依赖：[emqx-exproto-java-sdk.jar](https://github.com/emqx/emqx-exproto-java-sdk/)
+## 下载依赖
 
+### SDK `emqx-exproto-java-sdk.jar`
+
+驱动版本选择参考[README.md](https://github.com/emqx/emqx-exproto-java-sdk/blob/master/README.md)   ``SDK edition & EMQ X Broker edition``章节。 
+
+#### 1 直接下载jar
+
+进入[下载页面](https://search.maven.org/search?q=emqx)，选择与您正在使用的EMQ X Broker版本对应的驱动。
+
+#### 2 使用maven引入`emqx-exproto-java-sdk.jar`
+
+打开maven项目的pom.xml文件，在`<dependencies></dependencies>`标签内，添加记录：
+
+```xml
+<dependency>
+  <groupId>io.emqx</groupId>
+  <artifactId>emqx-exproto-java-sdk</artifactId>
+  <!-- 
+			版本选择请按照部署的EMQ X Broker版本选择，版本对应请参考
+			https://github.com/emqx/emqx-exproto-java-sdk/blob/master/README.md 
+			的 SDK edition & EMQ X Broker edition 章节，
+			此处的版本号<version>0.0.1</version>仅作为示例
+ -->
+  <version>0.0.1</version>
+</dependency>
+```
+
+### SDK 依赖`erlport.jar`
+
+使用[下载链接](https://github.com/emqx/emqx-exproto-java-sdk/raw/master/src/lib/erlport.jar)下载。
 
 ## 示例
 
-我们提供了 [ExProtoHandlerDemo.java](https://github.com/emqx/emqx-exproto-java-sdk/blob/master/example/ExProtoHandlerDemo.java) 示例程序，
+我们提供了 [ExProtoHandlerDemo.java](https://github.com/emqx/emqx-exproto-java-sdk/blob/master/example/ExProtoHandlerDemo.java) 示例程序，此示例程序提供了终端与EMQ X 插件的简单的交互功能。
+
 该程序继承自 SDK 中的 `AbstractExProtoHandler` 类。
 
 ```java
-import io.emqx.exproto.*;
+import java.math.BigInteger;
+import java.util.Arrays;
 
 /**
  * EMQ X ExProto java SDK;
@@ -34,7 +65,8 @@ import io.emqx.exproto.*;
  */
 public class ExProtoHandlerDemo extends AbstractExProtoHandler {
 
-    private static ExProtoHandlerDemo exProtoHandlerDemo = new ExProtoHandlerDemo(new String[]{"Don't use [System.in.*] or [System.out.*]"});
+
+    private static ExProtoHandlerDemo exProtoHandlerDemo = new ExProtoHandlerDemo(new String[]{"don't use [System.in.*]  or [System.out.*]"});
 
     public ExProtoHandlerDemo() {
         ExProto.loadExProtoHandler(exProtoHandlerDemo);
@@ -42,10 +74,17 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
 
     public ExProtoHandlerDemo(String[] args) {
         for (String arg : args) {
-            //use [System.err.*] is fine
             System.err.println(arg);
         }
     }
+
+    String help =
+            				"hello      -->     say hello to AbstractExProtoHandler\r\n" +
+                    "close      -->     close conn\r\n" +
+                    "reg        -->     register client \r\n" +
+                    "pub        -->     publish message\r\n" +
+                    "sub        -->     subscribe mytopic qos 1\r\n" +
+                    "unsub      -->     unsubscribe mytopic";
 
     /**
      * A connection established.
@@ -58,8 +97,11 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      */
     @Override
     public void onConnectionEstablished(Connection connection, ConnectionInfo connectionInfo) {
-        System.err.println(connection);
-        System.err.println(connectionInfo);
+        System.err.println("onConnectionEstablished " + connection.getPid() + "  " + connectionInfo);
+        try {
+            send(connection, help.getBytes());
+        } catch (Exception e) {
+        }
     }
 
     /**
@@ -72,8 +114,80 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      */
     @Override
     public void onConnectionReceived(Connection connection, byte[] data) {
-        System.err.println(connection);
-        System.err.println(new String(data));
+        String command = new String(data).trim();
+        System.err.println(command);
+        switch (command) {
+            case "":
+                break;
+            case "hello":
+                try {
+                    send(connection, ("hello my friend " + connection.getPid().id + "\r\n").getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            case "close":
+                try {
+                    send(connection, ("goodbye my friend " + connection.getPid().id + "\r\n").getBytes());
+                    terminate(connection);
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            case "reg":
+                try {
+                    ClientInfo clientInfo = new ClientInfo("mqtt", "3.1", "testCID", "testUname", "testMP/", 300);
+                    register(connection, clientInfo);
+                    System.err.println(ClientInfo.toErlangDataType(clientInfo));
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            case "pub":
+                try {
+                    Message message =
+                            new Message("testId", 0, "from", "mytopic", "pubmessage".getBytes(), new BigInteger("" + System.currentTimeMillis()));
+                    publish(connection, message);
+                    send(connection, ("publish " + message.toString()).getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            case "sub":
+                try {
+                    String topic = "mytopic";
+                    subscribe(connection, topic, 1);
+                    System.err.println("subscribe " + topic);
+                    send(connection, ("subscribe " + topic + " qos " + 1).getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            case "unsub":
+                try {
+                    String unSubTop = "mytopic";
+                    unsubscribe(connection, unSubTop);
+                    System.err.println("subscribe " + unSubTop);
+                    send(connection, ("unsubscribe " + unSubTop).getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+            case "help":
+                try {
+                    send(connection, help.getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+            default:
+                try {
+                    send(connection, ("i don't know " + command + "\r\n").getBytes());
+                } catch (Exception e) {
+                    System.err.println(command + " ERROR");
+                }
+                break;
+        }
+
     }
 
     /**
@@ -90,8 +204,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      */
     @Override
     public void onConnectionTerminated(Connection connection, String reason) {
-        System.err.println(connection);
-        System.err.println(reason);
+        System.err.println("onConnectionTerminated " + connection.getPid() + " Reason " + reason);
     }
 
     /**
@@ -108,9 +221,11 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
      */
     @Override
     public void onConnectionDeliver(Connection connection, Message[] messagesArr) {
-        System.err.println(connection);
-        for (Message message : messagesArr) {
-            System.err.println(message);
+        System.err.println("onConnectionDeliver " + connection.getPid() + "  " + Arrays.toString(messagesArr));
+        try {
+            send(connection, Arrays.toString(messagesArr).getBytes());
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
 }
@@ -123,6 +238,35 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
 | onConnectionReceived    | 终端发送消息至EMQ X Borker |
 | onConnectionTerminated  | 终端断开连接               |
 | onConnectionDeliver     | EMQ X Broker订阅消息       |
+
+### 示例程序使用方式
+
+1 启动EMQ X Broker
+
+```shell
+./bin/emqx console
+```
+
+2 使用telnet程序接入EMQ X Broker
+
+```shell
+#[IP] 	: EMQ X Broker部署的IP
+#[Port]	: SDK配置（详见部署章节）中指定的监听端口
+telnet [IP] [Port]
+```
+
+3 使用一些简单交互命令
+
+| 指令  | 操作                                |
+| ----- | ----------------------------------- |
+| hello | say hello to AbstractExProtoHandler |
+| close | close conn                          |
+| reg   | register client                     |
+| pub   | publish message                     |
+| sub   | subscribe mytopic qos 1             |
+| unsub | unsubscribe mytopicclose            |
+
+输入指令后回车执行，观察控制台输出。
 
 ## SDK
 
@@ -220,6 +364,9 @@ received(Object conn, Object data, Object state)
 ```java
 deliver(Object conn, Object msgs0, Object state)
 ```
+```java
+loadExProtoHandler(AbstractExProtoHandler exprotoHandler)
+```
 ### 数据封装
 
 #### Connection
@@ -298,7 +445,7 @@ exproto.listener.protoname.driver_search_path = data/javaexprotodemo
 exproto.listener.protoname.driver_callback_module = ExProtoHandlerDemo
 ```
 
-3. 使用 `bin/emqx consnole` 启动 EMQ X 并开启 `emqx_exproto` 插件。
+3. 使用 `./bin/emqx consnole` 启动 EMQ X 并开启 `emqx_exproto` 插件。
 4. 接入一个客户端，观察 console 中的输出。
 
 ## 特别说明

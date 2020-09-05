@@ -136,7 +136,14 @@ public abstract class AbstractExProtoHandler extends ExProto {
         Erlang.call("emqx_exproto", "subscribe", new Object[]{connection.getPid(), new Binary(topic), qos}, 5000);
     }
 
-    public static void loadExProtoHandler(AbstractExProtoHandler handler) {
-        loadExProtoHandler(handler);
+    /**
+     * The Connection UnSubscribe a Topic to EMQ X
+     *
+     * @param connection The Connection instance
+     * @param topic      The Topic name.
+     */
+    public static void unsubscribe(Connection connection, String topic) throws Exception {
+        Erlang.call("emqx_exproto", "unsubscribe", new Object[]{connection.getPid(), new Binary(topic)}, 5000);
     }
+
 }
