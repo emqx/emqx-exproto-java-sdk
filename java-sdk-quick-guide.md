@@ -47,7 +47,8 @@
 该程序继承自 SDK 中的 `AbstractExProtoHandler` 类。
 
 ```java
-import java.math.BigInteger;
+import io.emqx.exproto.*;
+
 import java.util.Arrays;
 
 /**
@@ -79,7 +80,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
     }
 
     String help =
-            				"hello      -->     say hello to AbstractExProtoHandler\r\n" +
+            "hello      -->     say hello to AbstractExProtoHandler\r\n" +
                     "close      -->     close conn\r\n" +
                     "reg        -->     register client \r\n" +
                     "pub        -->     publish message\r\n" +
@@ -139,6 +140,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
                     ClientInfo clientInfo = new ClientInfo("mqtt", "3.1", "testCID", "testUname", "testMP/", 300);
                     register(connection, clientInfo);
                     System.err.println(ClientInfo.toErlangDataType(clientInfo));
+                    send(connection, ("register a client  " + clientInfo.toString()).getBytes());
                 } catch (Exception e) {
                     System.err.println(command + " ERROR");
                 }
@@ -146,7 +148,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
             case "pub":
                 try {
                     Message message =
-                            new Message("testId", 0, "from", "mytopic", "pubmessage".getBytes(), new BigInteger("" + System.currentTimeMillis()));
+                            new Message("testId", 0, "from", "mytopic", "pubmessage".getBytes(), System.currentTimeMillis());
                     publish(connection, message);
                     send(connection, ("publish " + message.toString()).getBytes());
                 } catch (Exception e) {
@@ -172,6 +174,7 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
                 } catch (Exception e) {
                     System.err.println(command + " ERROR");
                 }
+                break;
             case "help":
                 try {
                     send(connection, help.getBytes());
@@ -223,13 +226,12 @@ public class ExProtoHandlerDemo extends AbstractExProtoHandler {
     public void onConnectionDeliver(Connection connection, Message[] messagesArr) {
         System.err.println("onConnectionDeliver " + connection.getPid() + "  " + Arrays.toString(messagesArr));
         try {
-            send(connection, Arrays.toString(messagesArr).getBytes());
+            send(connection, ("\nonConnectionDeliver " + Arrays.toString(messagesArr)).getBytes());
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
 }
-
 ```
 示例中实现了4个回调函数，分别处理以下事件：
 | 函数                    | 回调事件                   |
@@ -419,14 +421,14 @@ Peer cert
 
 EMQ X Broker Message
 
-| Attribute | Type       |
-| --------- | ---------- |
-| id        | String     |
-| qos       | int        |
-| from      | String     |
-| topic     | String     |
-| payload   | byte[]     |
-| timestamp | BigInteger |
+| Attribute | Type   |
+| --------- | ------ |
+| id        | String |
+| qos       | int    |
+| from      | String |
+| topic     | String |
+| payload   | byte[] |
+| timestamp | long   |
 
 
 
