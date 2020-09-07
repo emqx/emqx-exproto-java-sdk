@@ -10,7 +10,7 @@
 
 | SDK edition | EMQ X Broker edition |
 | ----------- | -------------------- |
-| 0.0.1       | 4.2.0                |
+| 0.0.2       | 4.2.0                |
 | unsupport   | before 4.2.0         |
 
 ## Get Started

@@ -14,7 +14,7 @@
     </url>
     <groupId>io.emqx</groupId>
     <artifactId>emqx-exproto-java-sdk</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
