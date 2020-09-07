@@ -14,7 +14,16 @@ public class Message {
     private String from;
     private String topic;
     private byte[] payload;
-    private BigInteger timestamp;
+    private long timestamp;
+
+    public Message(String id, int qos, String from, String topic, byte[] payload, long timestamp) {
+        this.id = id;
+        this.qos = qos;
+        this.from = from;
+        this.topic = topic;
+        this.payload = payload;
+        this.timestamp = timestamp;
+    }
 
     public Message(String id, int qos, String from, String topic, byte[] payload, BigInteger timestamp) {
         this.id = id;
@@ -22,7 +31,7 @@ public class Message {
         this.from = from;
         this.topic = topic;
         this.payload = payload;
-        this.timestamp = timestamp;
+        this.setTimestamp(timestamp);
     }
 
     public static Message[] parser(Object msgObj) {
@@ -64,7 +73,7 @@ public class Message {
                     message.setPayload(value_b.raw);
                     break;
                 case "timestamp":
-                    message.setTimestamp((BigInteger) value);
+                    message.setTimestamp(value);
                     break;
             }
         }
@@ -79,7 +88,7 @@ public class Message {
         tupleArrayList.add(Tuple.two(new Atom("from"), new Binary(message.getFrom())));
         tupleArrayList.add(Tuple.two(new Atom("topic"), new Binary(message.getTopic())));
         tupleArrayList.add(Tuple.two(new Atom("payload"), new Binary(message.getPayload())));
-        tupleArrayList.add(Tuple.two(new Atom("timestamp"), message.getTimestamp()));
+        tupleArrayList.add(Tuple.two(new Atom("timestamp"), new BigInteger("" + message.getTimestamp())));
         return tupleArrayList;
     }
 
@@ -126,12 +135,22 @@ public class Message {
         this.payload = payload;
     }
 
-    public BigInteger getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(BigInteger timestamp) {
+    public void setTimestamp(Object timestamp) {
+        if (timestamp instanceof BigInteger) {
+            setTimestamp((BigInteger) timestamp);
+        }
+    }
+
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public void setTimestamp(BigInteger timestamp) {
+        this.timestamp = Long.parseLong(timestamp.toString());
     }
 
     @Override
